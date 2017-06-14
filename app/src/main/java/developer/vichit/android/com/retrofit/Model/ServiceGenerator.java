@@ -18,7 +18,8 @@ public class ServiceGenerator {
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
     private static Retrofit.Builder builder = new Retrofit.Builder()
-            .baseUrl("https://jsonplaceholder.typicode.com/")
+//            .baseUrl("https://jsonplaceholder.typicode.com/")
+            .baseUrl("http://110.74.194.125:1301/")
             .addConverterFactory(GsonConverterFactory.create());
 
     public static <S> S createService(Class<S> serviceClass) {
