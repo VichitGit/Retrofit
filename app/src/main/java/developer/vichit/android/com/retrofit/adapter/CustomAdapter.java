@@ -4,6 +4,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -11,12 +12,14 @@ import java.util.List;
 
 import developer.vichit.android.com.retrofit.Model.ArticelRespone;
 import developer.vichit.android.com.retrofit.R;
+import developer.vichit.android.com.retrofit.interfacce_generator.MyClickListener;
 
 
 public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder> {
 
     List<ArticelRespone.Articel> articelList;
     ArticelRespone.Articel articel;
+    MyClickListener myClickListener;
 
     public CustomAdapter() {
         articelList = new ArrayList<>();
@@ -50,13 +53,30 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
 
     public void addMoreItems(List<ArticelRespone.Articel> articelList) {
         this.articelList.addAll(articelList);
+        this.articelList.addAll(articelList);
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+
+    public void clearList() {
+        this.articelList.clear();
+    }
+    public ArticelRespone.Articel getArticel (int position){
+        return this.articelList.get(position);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        myClickListener = (MyClickListener) recyclerView.getContext();
+    }
+
+
+
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView tvTitle, tvDescription, tvDate, tvAuthor, tvCategory;
-
+        ImageButton ibMenu;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -66,6 +86,17 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
             tvCategory = (TextView) itemView.findViewById(R.id.tvCategory);
             tvAuthor = (TextView) itemView.findViewById(R.id.tvAuthor);
             tvDate = (TextView) itemView.findViewById(R.id.tvDate);
+            ibMenu = (ImageButton) itemView.findViewById(R.id.ibMenu);
+
+            ibMenu.setOnClickListener(this);
+
+        }
+
+        @Override
+        public void onClick(View v) {
+            myClickListener.onClick(getAdapterPosition(), v);
+
         }
     }
 }
+
