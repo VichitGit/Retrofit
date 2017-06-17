@@ -1,5 +1,8 @@
 package developer.vichit.android.com.retrofit.Model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
@@ -50,7 +53,7 @@ public class ArticelRespone {
 
 
     //Author Class
-    public static class Author {
+    public static class Author implements Parcelable {
         @SerializedName("ID")
         private int id;
         @SerializedName("NAME")
@@ -67,6 +70,29 @@ public class ArticelRespone {
         private String facebookId;
         @SerializedName("IMAGE_URL")
         private String imageUrl;
+
+        protected Author(Parcel in) {
+            id = in.readInt();
+            name = in.readString();
+            email = in.readString();
+            gender = in.readString();
+            telephone = in.readString();
+            status = in.readString();
+            facebookId = in.readString();
+            imageUrl = in.readString();
+        }
+
+        public static final Parcelable.Creator<Author> CREATOR = new Parcelable.Creator<Author>() {
+            @Override
+            public Author createFromParcel(Parcel in) {
+                return new Author(in);
+            }
+
+            @Override
+            public Author[] newArray(int size) {
+                return new Author[size];
+            }
+        };
 
         public int getId() {
             return id;
@@ -131,15 +157,49 @@ public class ArticelRespone {
         public void setImageUrl(String imageUrl) {
             this.imageUrl = imageUrl;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(id);
+            dest.writeString(name);
+            dest.writeString(email);
+            dest.writeString(gender);
+            dest.writeString(telephone);
+            dest.writeString(status);
+            dest.writeString(facebookId);
+            dest.writeString(imageUrl);
+        }
     }
 
 
     //Category Class
-    public static class Category {
+    public static class Category implements Parcelable {
         @SerializedName("ID")
         private int id;
         @SerializedName("NAME")
         private String name;
+
+        protected Category(Parcel in) {
+            id = in.readInt();
+            name = in.readString();
+        }
+
+        public static final Parcelable.Creator<Category> CREATOR = new Parcelable.Creator<Category>() {
+            @Override
+            public Category createFromParcel(Parcel in) {
+                return new Category(in);
+            }
+
+            @Override
+            public Category[] newArray(int size) {
+                return new Category[size];
+            }
+        };
 
         public int getId() {
             return id;
@@ -156,10 +216,21 @@ public class ArticelRespone {
         public void setName(String name) {
             this.name = name;
         }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(id);
+            dest.writeString(name);
+        }
     }
 
     //Articel Class
-    public static class Articel {
+    public static class Articel implements Parcelable {
         @SerializedName("ID")
         private int id;
         @SerializedName("TITLE")
@@ -176,6 +247,29 @@ public class ArticelRespone {
         private Category category;
         @SerializedName("IMAGE")
         private String image;
+
+        protected Articel(Parcel in) {
+            id = in.readInt();
+            title = in.readString();
+            description = in.readString();
+            createdDate = in.readString();
+            author = in.readParcelable(Author.class.getClassLoader());
+            status = in.readString();
+            category = in.readParcelable(Category.class.getClassLoader());
+            image = in.readString();
+        }
+
+        public static final Parcelable.Creator<Articel> CREATOR = new Parcelable.Creator<Articel>() {
+            @Override
+            public Articel createFromParcel(Parcel in) {
+                return new Articel(in);
+            }
+
+            @Override
+            public Articel[] newArray(int size) {
+                return new Articel[size];
+            }
+        };
 
         public int getId() {
             return id;
@@ -239,6 +333,23 @@ public class ArticelRespone {
 
         public void setImage(String image) {
             this.image = image;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(id);
+            dest.writeString(title);
+            dest.writeString(description);
+            dest.writeString(createdDate);
+            dest.writeParcelable(author, flags);
+            dest.writeString(status);
+            dest.writeParcelable(category, flags);
+            dest.writeString(image);
         }
     }
 

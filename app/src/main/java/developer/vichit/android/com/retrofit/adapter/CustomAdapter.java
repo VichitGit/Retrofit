@@ -51,20 +51,40 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         return articelList.size();
     }
 
+    //Add items to array.
     public void addMoreItems(List<ArticelRespone.Articel> articelList) {
-        this.articelList.addAll(articelList);
         this.articelList.addAll(articelList);
         notifyDataSetChanged();
     }
 
 
+    //clear list
     public void clearList() {
         this.articelList.clear();
     }
+
+    //get position Article
     public ArticelRespone.Articel getArticel (int position){
         return this.articelList.get(position);
     }
 
+    //loop for refresh RecyclerView
+    public void updateItemOf(ArticelRespone.Articel article){
+
+        for (ArticelRespone.Articel temp: this.articelList) {
+            if (temp.getId() == article.getId()){
+                temp.setTitle(article.getTitle());
+                temp.setDescription(article.getDescription());
+                int position = this.articelList.indexOf(temp);
+
+                notifyItemChanged(position);
+                return;
+            }
+        }
+
+    }
+
+    //Send Referance by Recyclerview
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         myClickListener = (MyClickListener) recyclerView.getContext();

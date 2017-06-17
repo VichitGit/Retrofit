@@ -2,6 +2,7 @@ package developer.vichit.android.com.retrofit;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -13,9 +14,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import developer.vichit.android.com.retrofit.Model.ArticelRespone;
 import developer.vichit.android.com.retrofit.Model.ServiceGenerator;
+import developer.vichit.android.com.retrofit.Model.UpdateArticleRespone;
 import developer.vichit.android.com.retrofit.adapter.CustomAdapter;
+import developer.vichit.android.com.retrofit.event.ArticleUpdateEvent;
+import developer.vichit.android.com.retrofit.form.UpdateArticleForm;
 import developer.vichit.android.com.retrofit.interfacce_generator.MyClickListener;
 import developer.vichit.android.com.retrofit.interfacce_generator.PostArticelService;
 import retrofit2.Call;
@@ -29,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
     EditText edKeyword;
     PostArticelService postArticelService;
     ArticelRespone.Articel articel;
+
     Handler handler;
     Runnable runnable;
 
@@ -78,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
     }
 
+    //Load Article
     private void loadArticle(String keyword) {
 
         Call<ArticelRespone> call = postArticelService.findArticelByTitle(keyword);
@@ -100,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
     }
 
+
+    //Popup Update Article
     @Override
     public void onClick(int position, View view) {
         articel = customAdapter.getArticel(position);
@@ -114,7 +126,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
                         break;
                     case R.id.popUpdate:
-
+                        DialogFragment fragment = MyDiaLogFragment.newInstance(articel);
+                        fragment.show(getSupportFragmentManager(), "MyDialogFragment");
                         break;
                 }
                 return false;
@@ -123,5 +136,48 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         popupMenu.show();
 
     }
+
+    //Start EventBus that declare in DialogFragment
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    //Stop EventBus that declare in DialogFragment
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    //Subscriber
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onArticleUpdateEvent(ArticleUpdateEvent event){
+        final ArticelRespone.Articel article = event.getArticle();
+        UpdateArticleForm form = new UpdateArticleForm(
+                article.getTitle(),
+                article.getDescription(),
+                article.getAuthor().getId(),
+                article.getCategory().getId(),
+                article.getStatus(),
+                article.getImage()
+        );
+
+        //Update Article
+        Call<UpdateArticleRespone> updateArticle = postArticelService.updateArticle(article.getId(), form);
+        updateArticle.enqueue(new Callback<UpdateArticleRespone>() {
+            @Override
+            public void onResponse(Call<UpdateArticleRespone> call, Response<UpdateArticleRespone> response) {
+                customAdapter.updateItemOf(response.body().getArticle());
+            }
+
+            @Override
+            public void onFailure(Call<UpdateArticleRespone> call, Throwable t) {
+
+            }
+        });
+    }
+
 }
 
