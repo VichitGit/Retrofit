@@ -14,17 +14,27 @@ import com.mobsandgeeks.saripaar.annotation.Password;
 
 import java.util.List;
 
+import developer.vichit.android.com.retrofit.Model.LoginRespone;
+import developer.vichit.android.com.retrofit.Model.ServiceGenerator;
 import developer.vichit.android.com.retrofit.R;
+import developer.vichit.android.com.retrofit.form.UserLogin;
+import developer.vichit.android.com.retrofit.interfacce_generator.LoginService;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class LoginUser extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
+public class LoginUserActivity extends AppCompatActivity implements View.OnClickListener, Validator.ValidationListener {
 
     @Email(message = "Wrong Email")
     EditText edEmail;
 
-    @Password(min = 8, message = "Invaild Password..!")
+    @Password(min = 6, message = "Invaild Password..!")
     EditText edPassword;
     Button btnLogin;
-    private Validator validator;
+
+    Validator validator;
+    LoginService loginService;
+    UserLogin userLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +50,9 @@ public class LoginUser extends AppCompatActivity implements View.OnClickListener
         validator = new Validator(this);
         validator.setValidationListener(this);
 
+        loginService = ServiceGenerator.createService(LoginService.class);
+
+
 
     }
 
@@ -51,7 +64,30 @@ public class LoginUser extends AppCompatActivity implements View.OnClickListener
 
     @Override
     public void onValidationSucceeded() {
-        Toast.makeText(this, "Doing something", Toast.LENGTH_SHORT).show();
+        userLogin = new UserLogin();
+        userLogin.setEMAIL(edEmail.getText().toString());
+        userLogin.setPassword(edPassword.getText().toString());
+
+        Call<LoginRespone> loginRespone = loginService.loginUser(userLogin);
+        loginRespone.enqueue(new Callback<LoginRespone>() {
+            @Override
+            public void onResponse(Call<LoginRespone> call, Response<LoginRespone> response) {
+                if (response.body().getCode().equals("0000")){
+                    Toast.makeText(getApplicationContext(),"successfully",Toast.LENGTH_SHORT).show();
+
+                }else{
+                    Toast.makeText(getApplicationContext(),"suceesfully failed",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginRespone> call, Throwable t) {
+
+            }
+        });
+
+
+
     }
 
     @Override
