@@ -21,6 +21,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import developer.vichit.android.com.retrofit.adapter.CustomAdapter;
 import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
 import developer.vichit.android.com.retrofit.article_respone.UpdateArticleRespone;
+import developer.vichit.android.com.retrofit.event.ArticleLoadMoreEvent;
 import developer.vichit.android.com.retrofit.event.ArticleUpdateEvent;
 import developer.vichit.android.com.retrofit.form_request.UpdateArticleForm;
 import developer.vichit.android.com.retrofit.interfacce_generator.MyClickListener;
@@ -30,6 +31,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
     ArticelRespone.Articel articel;
 
     private CompositeDisposable compositeDisposable;
+    private int totalPage;
+    private int page = 1;
 
     Handler handler;
     Runnable runnable;
@@ -58,8 +62,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         compositeDisposable = new CompositeDisposable();
 
         rv = (RecyclerView) findViewById(R.id.rvMainActivity);
+
         rv.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
-        customAdapter = new CustomAdapter();
+
+        customAdapter = new CustomAdapter(rv);
+
         rv.setAdapter(customAdapter);
 
 
@@ -75,8 +82,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
         //Service
         postArticelService = ServiceGenerator.createService(PostArticelService.class);
-        loadArticle(edKeyword.getText().toString());
-        edKeyword.addTextChangedListener(this);
+//        loadArticle(edKeyword.getText().toString());
+        loadArticleByPagination(page);
+        //edKeyword.addTextChangedListener(this);
     }
 
 
@@ -120,33 +128,78 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         Observable<ArticelRespone> finaArticleByTitle = postArticelService.findArticelByTittle(keyword);
         compositeDisposable.add(
                 finaArticleByTitle.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<ArticelRespone>() {
-                    @Override
-                    public void onNext(ArticelRespone articelRespone) {
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeWith(new DisposableObserver<ArticelRespone>() {
+                            @Override
+                            public void onNext(ArticelRespone articelRespone) {
 
-                        customAdapter.clearList();
-                        customAdapter.addMoreItems(articelRespone.getArticellist());
+                                customAdapter.clearList();
+                                customAdapter.addMoreItems(articelRespone.getArticellist());
+
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                Log.e("ooooo", "Complete");
+
+                            }
+                        }));
+
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRecyclerArticleLoadMore(ArticleLoadMoreEvent event) {
+
+        if (page == totalPage) {
+            return;
+        }
+
+        customAdapter.addProgressBar();
+        loadArticleByPagination(++page);
+//        Log.e("pppppp", page + "");
+    }
+
+
+    //Load more item by pagination
+    private void loadArticleByPagination(int page) {
+        compositeDisposable.add(postArticelService.findArticleByPagination(page)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<ArticelRespone>() {
+                    @Override
+                    public void onSuccess(final ArticelRespone articelRespone) {
+                        totalPage = articelRespone.getPagination().getTotalPages();
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (customAdapter.isLoading()) {
+                                    customAdapter.removeProgressBar();
+                                }
+
+                                customAdapter.addMoreItems(articelRespone.getArticellist());
+                                customAdapter.onLoaded();
+
+
+                            }
+                        }, 2000);
 
 
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        e.printStackTrace();
-
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.e("ooooo", "Complete");
 
                     }
                 }));
-
-
-
-
     }
 
 
@@ -176,23 +229,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
     }
 
-    //Start EventBus that declare in DialogFragment
-    @Override
-    protected void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    //Stop EventBus that declare in DialogFragment
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventBus.getDefault().unregister(this);
-    }
 
     //Subscriber
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onArticleUpdateEvent(ArticleUpdateEvent event){
+    public void onArticleUpdateEvent(ArticleUpdateEvent event) {
         final ArticelRespone.Articel article = event.getArticle();
         UpdateArticleForm form = new UpdateArticleForm(
                 article.getTitle(),
@@ -216,6 +256,20 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
             }
         });
+    }
+
+    //Start EventBus that declare in DialogFragment
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    //Stop EventBus that declare in DialogFragment
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
