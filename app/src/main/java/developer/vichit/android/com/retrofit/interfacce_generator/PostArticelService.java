@@ -3,6 +3,7 @@ package developer.vichit.android.com.retrofit.interfacce_generator;
 import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
 import developer.vichit.android.com.retrofit.article_respone.UpdateArticleRespone;
 import developer.vichit.android.com.retrofit.form_request.UpdateArticleForm;
+import io.reactivex.Observable;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -16,15 +17,16 @@ public interface PostArticelService {
     @GET("v1/api/articles")
     Call<ArticelRespone> findAllArticel();
 
+    //    @GET("v1/api/articles")
+//    Call<ArticelRespone> findArticelByTitle(@Query("title") String title);
     @GET("v1/api/articles")
-    Call<ArticelRespone> findArticelByTitle(@Query("title") String title);
+    Observable<ArticelRespone> findArticelByTittle(@Query("title") String title);
 
     @PUT("v1/api/articles/{id}")
     Call<UpdateArticleRespone> updateArticle(
             @Path("id") int id,
             @Body UpdateArticleForm updateArticleForm
     );
-
 
 
 }

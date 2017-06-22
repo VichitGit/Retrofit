@@ -18,14 +18,19 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
-import developer.vichit.android.com.retrofit.article_respone.ServiceGenerator;
-import developer.vichit.android.com.retrofit.article_respone.UpdateArticleRespone;
 import developer.vichit.android.com.retrofit.adapter.CustomAdapter;
+import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
+import developer.vichit.android.com.retrofit.article_respone.UpdateArticleRespone;
 import developer.vichit.android.com.retrofit.event.ArticleUpdateEvent;
 import developer.vichit.android.com.retrofit.form_request.UpdateArticleForm;
 import developer.vichit.android.com.retrofit.interfacce_generator.MyClickListener;
 import developer.vichit.android.com.retrofit.interfacce_generator.PostArticelService;
+import developer.vichit.android.com.retrofit.service_generator.ServiceGenerator;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -34,9 +39,11 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
     RecyclerView rv;
     CustomAdapter customAdapter;
 
-    EditText edKeyword;
+    private EditText edKeyword;
     PostArticelService postArticelService;
     ArticelRespone.Articel articel;
+
+    private CompositeDisposable compositeDisposable;
 
     Handler handler;
     Runnable runnable;
@@ -47,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         setContentView(R.layout.activity_main);
 
         edKeyword = (EditText) findViewById(R.id.edKeyword);
+
+        compositeDisposable = new CompositeDisposable();
 
         rv = (RecyclerView) findViewById(R.id.rvMainActivity);
         rv.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
@@ -90,23 +99,53 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
     //Load Article
     private void loadArticle(String keyword) {
 
-        Call<ArticelRespone> call = postArticelService.findArticelByTitle(keyword);
+//        Call<ArticelRespone> call = postArticelService.findArticelByTitle(keyword);
+//
+//        call.enqueue(new Callback<ArticelRespone>() {
+//            @Override
+//            public void onResponse(Call<ArticelRespone> call, Response<ArticelRespone> response) {
+//
+//                ArticelRespone articelRespone = response.body();
+//                customAdapter.clearList();
+//                customAdapter.addMoreItems(articelRespone.getArticellist());
+//                Log.e("ooooo", customAdapter.getItemCount() + "");
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ArticelRespone> call, Throwable t) {
+//
+//            }
+//        });
 
-        call.enqueue(new Callback<ArticelRespone>() {
-            @Override
-            public void onResponse(Call<ArticelRespone> call, Response<ArticelRespone> response) {
+        Observable<ArticelRespone> finaArticleByTitle = postArticelService.findArticelByTittle(keyword);
+        compositeDisposable.add(
+                finaArticleByTitle.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableObserver<ArticelRespone>() {
+                    @Override
+                    public void onNext(ArticelRespone articelRespone) {
 
-                ArticelRespone articelRespone = response.body();
-                customAdapter.clearList();
-                customAdapter.addMoreItems(articelRespone.getArticellist());
-                Log.e("ooooo", customAdapter.getItemCount() + "");
-            }
+                        customAdapter.clearList();
+                        customAdapter.addMoreItems(articelRespone.getArticellist());
 
-            @Override
-            public void onFailure(Call<ArticelRespone> call, Throwable t) {
 
-            }
-        });
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.e("ooooo", "Complete");
+
+                    }
+                }));
+
+
+
 
     }
 
@@ -179,5 +218,10 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.clear();
+    }
 }
 

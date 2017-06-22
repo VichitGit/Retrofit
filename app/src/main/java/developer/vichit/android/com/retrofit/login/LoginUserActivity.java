@@ -15,7 +15,7 @@ import com.mobsandgeeks.saripaar.annotation.Password;
 import java.util.List;
 
 import developer.vichit.android.com.retrofit.article_respone.LoginRespone;
-import developer.vichit.android.com.retrofit.article_respone.ServiceGenerator;
+import developer.vichit.android.com.retrofit.service_generator.ServiceGenerator;
 import developer.vichit.android.com.retrofit.R;
 import developer.vichit.android.com.retrofit.form_request.UserLogin;
 import developer.vichit.android.com.retrofit.interfacce_generator.LoginService;
