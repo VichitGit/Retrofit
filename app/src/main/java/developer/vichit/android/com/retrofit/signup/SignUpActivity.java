@@ -21,7 +21,7 @@ import com.google.gson.JsonObject;
 
 import java.io.File;
 
-import developer.vichit.android.com.retrofit.Model.ServiceGenerator;
+import developer.vichit.android.com.retrofit.article_respone.ServiceGenerator;
 import developer.vichit.android.com.retrofit.R;
 import developer.vichit.android.com.retrofit.interfacce_generator.ImageService;
 import developer.vichit.android.com.retrofit.interfacce_generator.UserService;

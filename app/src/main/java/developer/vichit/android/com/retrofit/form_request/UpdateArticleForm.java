@@ -1,4 +1,4 @@
-package developer.vichit.android.com.retrofit.form;
+package developer.vichit.android.com.retrofit.form_request;
 
 import com.google.gson.annotations.SerializedName;
 

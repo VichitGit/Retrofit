@@ -1,8 +1,8 @@
 package developer.vichit.android.com.retrofit.interfacce_generator;
 
-import developer.vichit.android.com.retrofit.Model.ArticelRespone;
-import developer.vichit.android.com.retrofit.Model.UpdateArticleRespone;
-import developer.vichit.android.com.retrofit.form.UpdateArticleForm;
+import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
+import developer.vichit.android.com.retrofit.article_respone.UpdateArticleRespone;
+import developer.vichit.android.com.retrofit.form_request.UpdateArticleForm;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;

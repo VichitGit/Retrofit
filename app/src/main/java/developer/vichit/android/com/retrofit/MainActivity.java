@@ -18,12 +18,12 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import developer.vichit.android.com.retrofit.Model.ArticelRespone;
-import developer.vichit.android.com.retrofit.Model.ServiceGenerator;
-import developer.vichit.android.com.retrofit.Model.UpdateArticleRespone;
+import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
+import developer.vichit.android.com.retrofit.article_respone.ServiceGenerator;
+import developer.vichit.android.com.retrofit.article_respone.UpdateArticleRespone;
 import developer.vichit.android.com.retrofit.adapter.CustomAdapter;
 import developer.vichit.android.com.retrofit.event.ArticleUpdateEvent;
-import developer.vichit.android.com.retrofit.form.UpdateArticleForm;
+import developer.vichit.android.com.retrofit.form_request.UpdateArticleForm;
 import developer.vichit.android.com.retrofit.interfacce_generator.MyClickListener;
 import developer.vichit.android.com.retrofit.interfacce_generator.PostArticelService;
 import retrofit2.Call;

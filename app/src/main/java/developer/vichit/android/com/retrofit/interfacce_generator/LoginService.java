@@ -1,7 +1,7 @@
 package developer.vichit.android.com.retrofit.interfacce_generator;
 
-import developer.vichit.android.com.retrofit.Model.LoginRespone;
-import developer.vichit.android.com.retrofit.form.UserLogin;
+import developer.vichit.android.com.retrofit.article_respone.LoginRespone;
+import developer.vichit.android.com.retrofit.form_request.UserLogin;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;

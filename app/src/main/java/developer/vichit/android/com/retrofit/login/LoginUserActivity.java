@@ -14,10 +14,10 @@ import com.mobsandgeeks.saripaar.annotation.Password;
 
 import java.util.List;
 
-import developer.vichit.android.com.retrofit.Model.LoginRespone;
-import developer.vichit.android.com.retrofit.Model.ServiceGenerator;
+import developer.vichit.android.com.retrofit.article_respone.LoginRespone;
+import developer.vichit.android.com.retrofit.article_respone.ServiceGenerator;
 import developer.vichit.android.com.retrofit.R;
-import developer.vichit.android.com.retrofit.form.UserLogin;
+import developer.vichit.android.com.retrofit.form_request.UserLogin;
 import developer.vichit.android.com.retrofit.interfacce_generator.LoginService;
 import retrofit2.Call;
 import retrofit2.Callback;

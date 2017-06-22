@@ -1,6 +1,6 @@
 package developer.vichit.android.com.retrofit.event;
 
-import developer.vichit.android.com.retrofit.Model.ArticelRespone;
+import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
 
 /**
  * Created by VichitDeveloper on 6/17/17.

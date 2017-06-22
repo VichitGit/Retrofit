@@ -12,7 +12,7 @@ import android.widget.EditText;
 
 import org.greenrobot.eventbus.EventBus;
 
-import developer.vichit.android.com.retrofit.Model.ArticelRespone;
+import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
 import developer.vichit.android.com.retrofit.event.ArticleUpdateEvent;
 
 public class MyDiaLogFragment extends DialogFragment implements View.OnClickListener {

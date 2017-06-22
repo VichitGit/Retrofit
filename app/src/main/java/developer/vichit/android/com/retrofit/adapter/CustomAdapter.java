@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import developer.vichit.android.com.retrofit.Model.ArticelRespone;
+import developer.vichit.android.com.retrofit.article_respone.ArticelRespone;
 import developer.vichit.android.com.retrofit.R;
 import developer.vichit.android.com.retrofit.interfacce_generator.MyClickListener;
 
@@ -56,7 +56,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         this.articelList.addAll(articelList);
         notifyDataSetChanged();
     }
-
 
     //clear list
     public void clearList() {

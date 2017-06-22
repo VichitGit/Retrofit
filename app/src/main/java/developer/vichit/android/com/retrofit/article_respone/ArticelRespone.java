@@ -1,4 +1,4 @@
-package developer.vichit.android.com.retrofit.Model;
+package developer.vichit.android.com.retrofit.article_respone;
 
 import android.os.Parcel;
 import android.os.Parcelable;
