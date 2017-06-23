@@ -3,6 +3,7 @@ package developer.vichit.android.com.retrofit;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -37,7 +38,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements TextWatcher, MyClickListener {
+public class MainActivity extends AppCompatActivity implements TextWatcher, MyClickListener, SwipeRefreshLayout.OnRefreshListener {
     RecyclerView rv;
     CustomAdapter customAdapter;
 
@@ -51,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
     Handler handler;
     Runnable runnable;
+
+    private SwipeRefreshLayout swipeRefresh;
+    private static final int ITEMS_PER_PAGE = 15;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         customAdapter = new CustomAdapter(rv);
 
         rv.setAdapter(customAdapter);
+
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
+        swipeRefresh.setOnRefreshListener(this);
 
 
         //
@@ -169,28 +176,45 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
 
     //Load more item by pagination
-    private void loadArticleByPagination(int page) {
+    private void loadArticleByPagination(final int page) {
         compositeDisposable.add(postArticelService.findArticleByPagination(page)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ArticelRespone>() {
                     @Override
                     public void onSuccess(final ArticelRespone articelRespone) {
+
+
+                        if (swipeRefresh.isRefreshing()) {
+                            swipeRefresh.setRefreshing(false);
+                        }
+
+                        if (page == 1) {
+                            customAdapter.clearList();
+
+                        }
                         totalPage = articelRespone.getPagination().getTotalPages();
 
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (customAdapter.isLoading()) {
-                                    customAdapter.removeProgressBar();
-                                }
+                        if (customAdapter.isLoading() && customAdapter.size() > ITEMS_PER_PAGE) {
+                            customAdapter.removeProgressBar();
+                        }
 
-                                customAdapter.addMoreItems(articelRespone.getArticellist());
-                                customAdapter.onLoaded();
+                        customAdapter.addMoreItems(articelRespone.getArticellist());
+                        customAdapter.onLoaded();
+
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                if (customAdapter.isLoading()) {
+//                                    customAdapter.removeProgressBar();
+//                                }
+//
+//                                customAdapter.addMoreItems(articelRespone.getArticellist());
+//                                customAdapter.onLoaded();
 
 
-                            }
-                        }, 2000);
+//                            }
+//                        }, 2000);
 
 
                     }
@@ -258,6 +282,15 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         });
     }
 
+    //Refresh Data
+    @Override
+    public void onRefresh() {
+
+        page = 1;
+        loadArticleByPagination(page);
+
+    }
+
     //Start EventBus that declare in DialogFragment
     @Override
     protected void onStart() {
@@ -277,5 +310,7 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         super.onDestroy();
         compositeDisposable.clear();
     }
+
+
 }
 

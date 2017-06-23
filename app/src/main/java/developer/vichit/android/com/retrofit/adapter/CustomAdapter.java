@@ -71,6 +71,11 @@ public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return loading;
     }
 
+    public int size() {
+        return this.articelList.size();
+
+    }
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder vh = null;
