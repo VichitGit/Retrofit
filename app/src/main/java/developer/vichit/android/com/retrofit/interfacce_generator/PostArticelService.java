@@ -28,7 +28,10 @@ public interface PostArticelService {
 
     //Loading article 1 time 15 items
     @GET("v1/api/articles")
-    Single<ArticelRespone> findArticleByPagination(@Query("page") int page);
+    Single<ArticelRespone> findArticleByPagination(
+            @Query("page") int page,
+            @Query("title") String title
+    );
 
 
     //update

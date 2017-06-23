@@ -76,24 +76,24 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         swipeRefresh.setOnRefreshListener(this);
 
-
         //
         handler = new Handler();
         runnable = new Runnable() {
             @Override
             public void run() {
-
-                loadArticle(edKeyword.getText().toString());
+                //Refresh to page 1 if check search
+                page = 1;
+                //loadArticle(edKeyword.getText().toString());
+                loadArticleByPagination(page, edKeyword.getText().toString());
             }
         };
 
         //Service
         postArticelService = ServiceGenerator.createService(PostArticelService.class);
 //        loadArticle(edKeyword.getText().toString());
-        loadArticleByPagination(page);
-        //edKeyword.addTextChangedListener(this);
+        loadArticleByPagination(page, edKeyword.getText().toString());
+        edKeyword.addTextChangedListener(this);
     }
-
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -142,8 +142,6 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
 
                                 customAdapter.clearList();
                                 customAdapter.addMoreItems(articelRespone.getArticellist());
-
-
                             }
 
                             @Override
@@ -170,35 +168,38 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
         }
 
         customAdapter.addProgressBar();
-        loadArticleByPagination(++page);
+        loadArticleByPagination(++page, edKeyword.getText().toString());
 //        Log.e("pppppp", page + "");
     }
 
-
     //Load more item by pagination
-    private void loadArticleByPagination(final int page) {
-        compositeDisposable.add(postArticelService.findArticleByPagination(page)
+    private void loadArticleByPagination(final int page, String title) {
+        compositeDisposable.add(postArticelService.findArticleByPagination(page, title)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ArticelRespone>() {
                     @Override
                     public void onSuccess(final ArticelRespone articelRespone) {
 
-
+                        //if refreshing
                         if (swipeRefresh.isRefreshing()) {
                             swipeRefresh.setRefreshing(false);
                         }
 
+                        //clear articleList when page = 1,
                         if (page == 1) {
                             customAdapter.clearList();
 
                         }
+                        //get all page from article
                         totalPage = articelRespone.getPagination().getTotalPages();
 
+                        //custiomAdapter.size: get return size from articleList
                         if (customAdapter.isLoading() && customAdapter.size() > ITEMS_PER_PAGE) {
                             customAdapter.removeProgressBar();
                         }
 
+                        //Add more to recyclerview
                         customAdapter.addMoreItems(articelRespone.getArticellist());
                         customAdapter.onLoaded();
 
@@ -287,7 +288,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher, MyCl
     public void onRefresh() {
 
         page = 1;
-        loadArticleByPagination(page);
+        edKeyword.setText("");
+        loadArticleByPagination(page, edKeyword.getText().toString());
 
     }
 
